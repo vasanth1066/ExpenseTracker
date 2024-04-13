@@ -1,7 +1,14 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 const Completeprofile = () => {
   const [userFullname, setUserFullname] = useState("");
   const [userprofileurl, setUserprofileurl] = useState("");
+  const navigate = useNavigate();
+  const Logouthandler = (event) => {
+    event.preventDefault();
+    navigate("/SignIn");
+    localStorage.removeItem("token");
+  };
 
   const SubmitHandler = (event) => {
     event.preventDefault();
@@ -110,6 +117,13 @@ const Completeprofile = () => {
                   Complete now
                 </a>
               </li>
+              <button
+                type="button"
+                class="btn btn-danger"
+                onClick={Logouthandler}
+              >
+                Logout
+              </button>
             </ul>
           </div>
         </nav>

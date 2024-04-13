@@ -1,4 +1,5 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const ExpenseTracker = () => {
   const verifymailid = (event) => {
@@ -40,6 +41,12 @@ const ExpenseTracker = () => {
         alert(err.message);
       });
   };
+  const navigate = useNavigate();
+  const Logouthandler = (event) => {
+    event.preventDefault();
+    navigate("/SignIn");
+    localStorage.removeItem("token");
+  };
   return (
     <>
       <div>
@@ -54,6 +61,13 @@ const ExpenseTracker = () => {
                   Link
                 </a>
               </li>
+              <button
+                type="button"
+                class="btn btn-danger"
+                onClick={Logouthandler}
+              >
+                Logout
+              </button>
             </ul>
           </div>
         </nav>
