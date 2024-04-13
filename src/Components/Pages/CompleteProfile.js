@@ -118,7 +118,7 @@ const Completeprofile = () => {
         className="container-xl"
         style={{
           position: "fixed",
-          top: "30%",
+          top: "50%",
           left: "100%",
           transform: "translate(-50%, -50%)",
           backgroundSize: "cover",
