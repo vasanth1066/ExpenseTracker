@@ -126,7 +126,9 @@ const Login = () => {
             Submit
           </button>
         </form>
-        <button onClick={handleLoginClick} className="btn btn-secondary mt-4">
+
+        <span>Already Have an Account </span>
+        <button onClick={handleLoginClick} className="btn btn-secondary ">
           Go to Login Page
         </button>
       </div>
