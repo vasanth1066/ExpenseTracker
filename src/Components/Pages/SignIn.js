@@ -1,36 +1,19 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import MainHeader from "../Header/MainHeader";
-
 import { useNavigate } from "react-router-dom";
 
-const Login = () => {
+const SignIn = () => {
   const emailinputref = useRef();
   const passwordinputref = useRef();
-  const confirmpasswordinputref = useRef();
-  const [passwordError, setPasswordError] = useState("");
   const Navigate = useNavigate();
 
   const submitHandler = (event) => {
     event.preventDefault();
     const useremail = emailinputref.current.value;
     const userpassword = passwordinputref.current.value;
-    const userconfirmpassword = confirmpasswordinputref.current.value;
-    if (userpassword !== userconfirmpassword) {
-      setPasswordError("Passwords don't match");
-      return;
-    }
 
-    setPasswordError("");
-
-    // let myobj = {
-    //   useremail,
-    //   userpassword,
-    //   userconfirmpassword,
-    // };
-
-    // console.log(myobj);
     fetch(
-      "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyB7DSTo_2-kms1kJYEyWucRdwmYUTmNZHo",
+      "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyB7DSTo_2-kms1kJYEyWucRdwmYUTmNZHo",
       {
         method: "POST",
         body: JSON.stringify({
@@ -58,7 +41,8 @@ const Login = () => {
         }
       })
       .then((data) => {
-        console.log(data);
+        console.log("Logged in", data);
+        Navigate("/ExpenseTracker");
       })
       .catch((err) => {
         alert(err.message);
@@ -66,9 +50,8 @@ const Login = () => {
   };
 
   const handleLoginClick = () => {
-    Navigate("/SignIn");
+    Navigate("/Login");
   };
-
   return (
     <div>
       <MainHeader />
@@ -82,7 +65,7 @@ const Login = () => {
           backgroundSize: "cover",
         }}
       >
-        <h2>Signup</h2>
+        <h2>SignIn</h2>
         <form onSubmit={submitHandler}>
           <div className="mb-7 col-4">
             <label htmlFor="exampleInputEmail1" className="form-label">
@@ -109,34 +92,19 @@ const Login = () => {
               required
             />
           </div>
-          <div className="mb-3 col-4">
-            <label htmlFor="exampleInputPassword2" className="form-label">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              ref={confirmpasswordinputref}
-              className="form-control"
-              id="exampleInputPassword2"
-              required
-            />
-            {passwordError && (
-              <div className="invalid-feedback d-block">{passwordError}</div>
-            )}
-          </div>
+          <br />
 
-          <button type="submit" className="btn btn-primary">
-            Submit
+          <button type="submit" className="  btn btn-primary">
+            Login
           </button>
         </form>
 
-        <span>Already Have an Account </span>
-        <button onClick={handleLoginClick} className="btn btn-secondary ">
-          Go to Login Page
+        <span className=" mb-7 col-4  ">Create an Account </span>
+        <button onClick={handleLoginClick} className="  btn btn-secondary ">
+          Go to Signup
         </button>
       </div>
     </div>
   );
 };
-
-export default Login;
+export default SignIn;
