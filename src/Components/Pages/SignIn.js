@@ -41,7 +41,8 @@ const SignIn = () => {
         }
       })
       .then((data) => {
-        console.log("Logged in", data);
+        console.log("Logged in", data.idToken);
+        localStorage.setItem("token", data.idToken);
         Navigate("/ExpenseTracker");
       })
       .catch((err) => {
@@ -98,6 +99,7 @@ const SignIn = () => {
             Login
           </button>
         </form>
+        <br />
 
         <span className=" mb-7 col-4  ">Create an Account </span>
         <button onClick={handleLoginClick} className="  btn btn-secondary ">
