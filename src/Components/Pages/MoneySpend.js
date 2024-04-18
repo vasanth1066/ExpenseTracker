@@ -1,10 +1,11 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 const MoneySpend = () => {
   const [data, setData] = useState([]);
-  const moneyinputref = useRef();
-  const Descriptioninputref = useRef();
-  const Categoryinputref = useRef();
+
+  const [money, setMoney] = useState("");
+  const [description, setDescription] = useState("");
+  const [category, setCategory] = useState("");
 
   useEffect(() => {
     fetch(
@@ -34,13 +35,11 @@ const MoneySpend = () => {
 
   const moneyspenthandler = (event) => {
     event.preventDefault();
-    const usermoney = moneyinputref.current.value;
-    const userdescription = Descriptioninputref.current.value;
-    const usercategory = Categoryinputref.current.value;
+
     const myobj = {
-      usermoney,
-      userdescription,
-      usercategory,
+      money,
+      description,
+      category,
     };
 
     setData([...data, myobj]);
@@ -77,6 +76,73 @@ const MoneySpend = () => {
       });
   };
 
+  console.log(data);
+  const deleteHandler = (id) => {
+    fetch(
+      `https://expense-tracker-e9fa0-default-rtdb.firebaseio.com/expenseamount/${id}.json`,
+      {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          console.log("Data deleted from Firebase");
+
+          setData(data.filter((item) => item.id !== id));
+        } else {
+          return res.json().then((data) => {
+            let errormessage = "Data couldn't be deleted from Firebase";
+            if (data && data.error && data.error.message) {
+              errormessage = data.error.message;
+            }
+            throw new Error(errormessage);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting data from Firebase:", err);
+        alert(err.message);
+      });
+  };
+
+  const editHandler = (val) => {
+    setCategory(val.category);
+    setDescription(val.description);
+    setMoney(val.money);
+
+    fetch(
+      `https://expense-tracker-e9fa0-default-rtdb.firebaseio.com/expenseamount/${val.id}.json`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ money, description, category }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    )
+      .then((res) => {
+        if (res.ok) {
+          console.log("Data deleted from Firebase");
+          deleteHandler(val.id);
+        } else {
+          return res.json().then((data) => {
+            let errormessage = "Data couldn't be deleted from Firebase";
+            if (data && data.error && data.error.message) {
+              errormessage = data.error.message;
+            }
+            throw new Error(errormessage);
+          });
+        }
+      })
+      .catch((err) => {
+        console.error("Error deleting data from Firebase:", err);
+        alert(err.message);
+      });
+  };
+
   return (
     <>
       <div className="container-xl d-flex justify-content-center align-items-center">
@@ -89,7 +155,8 @@ const MoneySpend = () => {
               type="number"
               class="form-control"
               id="MoneySpent"
-              ref={moneyinputref}
+              value={money}
+              onChange={(e) => setMoney(e.target.value)}
             />
           </div>
           <div class="mb-7 ">
@@ -100,7 +167,8 @@ const MoneySpend = () => {
               type="text"
               class="form-control"
               id="Description"
-              ref={Descriptioninputref}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
             />
           </div>
           <div class="mb-7 ">
@@ -110,7 +178,8 @@ const MoneySpend = () => {
             <select
               class="form-select"
               aria-label="Default select example"
-              ref={Categoryinputref}
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
             >
               <option selected>Select any option below</option>
               <option value="Food">Food</option>
@@ -127,24 +196,40 @@ const MoneySpend = () => {
         </form>
       </div>
       <div className="container-xxl d-flex justify-content-left align-items-center">
-        {console.log("data", data)}
         <div>
           {data.map((val, index) => (
             <ul key={index} class="list-group">
               <li class="list-group-item d-flex justify-content-between align-items-center ">
                 <span class="list-group-item list-group-item-action list-group-item-success">
-                  Description:{val.userdescription}
+                  Description:{val.description}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
 
                 <span class="list-group-item list-group-item-action list-group-item-info">
-                  Category: {val.usercategory}
+                  Category: {val.category}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
 
                 <span class="badge bg-dark rounded-pill">
-                  Money Spent: {val.usermoney}
+                  Money Spent: {val.money}
                 </span>
+
+                <div style={{ marginRight: "10px" }}></div>
+                <button
+                  type="button"
+                  class="btn btn-light"
+                  onClick={() => editHandler(val)}
+                >
+                  Edit
+                </button>
+                <div style={{ marginRight: "10px" }}></div>
+                <button
+                  type="button"
+                  class="btn btn-danger"
+                  onClick={() => deleteHandler(val.id)}
+                >
+                  Delete
+                </button>
               </li>
             </ul>
           ))}
