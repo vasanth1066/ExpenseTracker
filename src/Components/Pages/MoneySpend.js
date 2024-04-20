@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { ExpenseAction } from "../../Store/ExpenseStore";
 
 const MoneySpend = () => {
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
 
   const [money, setMoney] = useState("");
@@ -27,6 +30,7 @@ const MoneySpend = () => {
           });
         }
         setData(dataArray);
+        dispatch(ExpenseAction.AddExpense(dataArray));
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -76,7 +80,7 @@ const MoneySpend = () => {
       });
   };
 
-  console.log(data);
+  // console.log(data);
   const deleteHandler = (id) => {
     fetch(
       `https://expense-tracker-e9fa0-default-rtdb.firebaseio.com/expenseamount/${id}.json`,
@@ -204,16 +208,13 @@ const MoneySpend = () => {
                   Description:{val.description}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
-
                 <span class="list-group-item list-group-item-action list-group-item-info">
                   Category: {val.category}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
-
                 <span class="badge bg-dark rounded-pill">
                   Money Spent: {val.money}
                 </span>
-
                 <div style={{ marginRight: "10px" }}></div>
                 <button
                   type="button"
@@ -230,6 +231,13 @@ const MoneySpend = () => {
                 >
                   Delete
                 </button>
+                <div style={{ marginRight: "10px" }}></div>
+
+                {val.money >= 10000 && (
+                  <button type="button" class="btn btn-success">
+                    Activate Premium
+                  </button>
+                )}
               </li>
             </ul>
           ))}

@@ -89,7 +89,6 @@ const Completeprofile = () => {
       })
       .then((data) => {
         console.log("get data profile page---", data);
-
         data.users.map((val) => {
           setUserFullname(val.displayName);
           setUserprofileurl(val.photoUrl);

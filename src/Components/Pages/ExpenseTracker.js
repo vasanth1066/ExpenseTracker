@@ -2,7 +2,12 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import MoneySpend from "./MoneySpend";
 
+import { useSelector } from "react-redux";
+
 const ExpenseTracker = () => {
+  const showdata = useSelector((state) => state.expense.data);
+  console.log("getdataform store", showdata);
+
   const verifymailid = (event) => {
     event.preventDefault();
     const token = localStorage.getItem("token");

@@ -2,10 +2,14 @@ import React, { useRef } from "react";
 import MainHeader from "../Header/MainHeader";
 import { useNavigate } from "react-router-dom";
 
+import { useDispatch } from "react-redux";
+import { AuthAction } from "../../Store/Authstore";
+
 const SignIn = () => {
   const emailinputref = useRef();
   const passwordinputref = useRef();
   const Navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const submitHandler = (event) => {
     event.preventDefault();
@@ -41,8 +45,10 @@ const SignIn = () => {
         }
       })
       .then((data) => {
-        console.log("Logged in", data.idToken);
+        console.log("Logged in", data);
         localStorage.setItem("token", data.idToken);
+        dispatch(AuthAction.Addtoken(data.idToken));
+        dispatch(AuthAction.AddUserID(data.email));
         Navigate("/ExpenseTracker");
       })
       .catch((err) => {
@@ -99,7 +105,8 @@ const SignIn = () => {
             Login
           </button>
         </form>
-        <h1></h1>
+        <div></div>
+
         <a href="/ForgotPassword" class="link-danger">
           Forgot Password
         </a>
