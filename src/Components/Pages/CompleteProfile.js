@@ -112,7 +112,7 @@ const Completeprofile = () => {
               </span>
 
               <li class="nav-item">
-                <a class="nav-link" href="">
+                <a class="nav-link" href="#">
                   Complete now
                 </a>
               </li>

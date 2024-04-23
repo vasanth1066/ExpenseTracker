@@ -2,13 +2,18 @@ import React, { useState, useEffect } from "react";
 import { useDispatch } from "react-redux";
 import { ExpenseAction } from "../../Store/ExpenseStore";
 
-const MoneySpend = () => {
+const MoneySpend = ({ isDarkMode }) => {
+  // Receive isDarkMode prop
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
 
   const [money, setMoney] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+
+  let totalexpenses = 0;
+  data.map((val) => (totalexpenses = totalexpenses + Number(val.money)));
+  console.log("totalexpenses", totalexpenses);
 
   useEffect(() => {
     fetch(
@@ -78,9 +83,12 @@ const MoneySpend = () => {
         console.error("Error storing data in Firebase:", err);
         alert(err.message);
       });
+
+    setMoney("");
+    setCategory("");
+    setDescription("");
   };
 
-  // console.log(data);
   const deleteHandler = (id) => {
     fetch(
       `https://expense-tracker-e9fa0-default-rtdb.firebaseio.com/expenseamount/${id}.json`,
@@ -98,11 +106,7 @@ const MoneySpend = () => {
           setData(data.filter((item) => item.id !== id));
         } else {
           return res.json().then((data) => {
-            let errormessage = "Data couldn't be deleted from Firebase";
-            if (data && data.error && data.error.message) {
-              errormessage = data.error.message;
-            }
-            throw new Error(errormessage);
+            throw new Error(data.error.message);
           });
         }
       })
@@ -120,7 +124,7 @@ const MoneySpend = () => {
     fetch(
       `https://expense-tracker-e9fa0-default-rtdb.firebaseio.com/expenseamount/${val.id}.json`,
       {
-        method: "PATCH",
+        method: "PUT",
         body: JSON.stringify({ money, description, category }),
         headers: {
           "Content-Type": "application/json",
@@ -146,46 +150,97 @@ const MoneySpend = () => {
         alert(err.message);
       });
   };
+  const exportCSV = () => {
+    const csvContent = data
+      .map((row) => Object.values(row).join(","))
+      .join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "expenses.csv");
+    document.body.appendChild(link);
+    link.click();
+    window.URL.revokeObjectURL(url);
+  };
 
   return (
-    <>
+    <div
+      className={`container-fluid ${
+        isDarkMode ? "bg-dark text-light" : "bg-light text-dark"
+      } p-3 vh-100 d-flex flex-column`}
+    >
+      {totalexpenses >= 10000 && (
+        <div
+          className="alert alert-success container-xl d-flex justify-content-center align-items-center"
+          role="alert"
+        >
+          <button type="button" className="btn btn-Success">
+            <h4> Activate Premium!!!</h4>
+          </button>
+        </div>
+      )}
       <div className="container-xl d-flex justify-content-center align-items-center">
-        <form onSubmit={moneyspenthandler}>
-          <div class="mb-7 ">
-            <label for="MoneySpent" class="form-label">
+        <form
+          onSubmit={moneyspenthandler}
+          className={`w-100 ${isDarkMode ? "text-light" : "text-dark"}`}
+        >
+          <div className="mb-7">
+            <label
+              htmlFor="MoneySpent"
+              className={`form-label ${
+                isDarkMode ? "text-light" : "text-dark"
+              }`}
+            >
               Money Spent
             </label>
             <input
               type="number"
-              class="form-control"
+              className={`form-control ${
+                isDarkMode ? "bg-dark text-light" : "bg-light text-dark"
+              }`}
               id="MoneySpent"
               value={money}
               onChange={(e) => setMoney(e.target.value)}
             />
           </div>
-          <div class="mb-7 ">
-            <label for="Description" class="form-label">
+          <div className="mb-7">
+            <label
+              htmlFor="Description"
+              className={`form-label ${
+                isDarkMode ? "text-light" : "text-dark"
+              }`}
+            >
               Description
             </label>
             <input
               type="text"
-              class="form-control"
+              className={`form-control ${
+                isDarkMode ? "bg-dark text-light" : "bg-light text-dark"
+              }`}
               id="Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
-          <div class="mb-7 ">
-            <label for="Category" class="form-label">
+          <div className="mb-7">
+            <label
+              htmlFor="Category"
+              className={`form-label ${
+                isDarkMode ? "text-light" : "text-dark"
+              }`}
+            >
               Category
             </label>
             <select
-              class="form-select"
+              className={`form-select ${
+                isDarkMode ? "bg-dark text-light" : "bg-light text-dark"
+              }`}
               aria-label="Default select example"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
             >
-              <option selected>Select any option below</option>
+              <option>Select any option below</option>
               <option value="Food">Food</option>
               <option value="Petrol">Petrol</option>
               <option value="Movie">Movie</option>
@@ -194,31 +249,58 @@ const MoneySpend = () => {
           </div>
           <br />
 
-          <button type="submit" class="btn btn-primary">
-            Submit
-          </button>
+          <div className="mb-3 d-flex justify-content-center">
+            <button type="submit" className="btn btn-primary">
+              Submit
+            </button>
+          </div>
+          <div style={{ marginBottom: "10px" }}></div>
         </form>
       </div>
-      <div className="container-xxl d-flex justify-content-left align-items-center">
+
+      <div
+        className={`container-xxl d-flex justify-content-center align-items-center ${
+          isDarkMode ? "text-light" : "text-black"
+        }`}
+      >
         <div>
           {data.map((val, index) => (
-            <ul key={index} class="list-group">
-              <li class="list-group-item d-flex justify-content-between align-items-center ">
-                <span class="list-group-item list-group-item-action list-group-item-success">
-                  Description:{val.description}
+            <ul
+              key={index}
+              className={`list-group ${isDarkMode ? "bg-dark text-light" : ""}`}
+            >
+              <li
+                className={`list-group-item d-flex justify-content-between align-items-center ${
+                  isDarkMode ? "bg-dark text-light" : ""
+                }`}
+              >
+                <span
+                  className={`list-group-item-action ${
+                    isDarkMode ? "text-light" : ""
+                  }`}
+                >
+                  {val.description}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
-                <span class="list-group-item list-group-item-action list-group-item-info">
-                  Category: {val.category}
+                <span
+                  className={`list-group-item-action ${
+                    isDarkMode ? "text-light" : ""
+                  }`}
+                >
+                  {val.category}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
-                <span class="badge bg-dark rounded-pill">
-                  Money Spent: {val.money}
+                <span
+                  className={`badge rounded-pill ${
+                    isDarkMode ? "bg-light text-dark" : "bg-dark text-light"
+                  }`}
+                >
+                  RS: {val.money}
                 </span>
                 <div style={{ marginRight: "10px" }}></div>
                 <button
                   type="button"
-                  class="btn btn-light"
+                  className="btn btn-secondary"
                   onClick={() => editHandler(val)}
                 >
                   Edit
@@ -226,24 +308,23 @@ const MoneySpend = () => {
                 <div style={{ marginRight: "10px" }}></div>
                 <button
                   type="button"
-                  class="btn btn-danger"
+                  className="btn btn-danger"
                   onClick={() => deleteHandler(val.id)}
                 >
                   Delete
                 </button>
-                <div style={{ marginRight: "10px" }}></div>
-
-                {val.money >= 10000 && (
-                  <button type="button" class="btn btn-success">
-                    Activate Premium
-                  </button>
-                )}
               </li>
             </ul>
           ))}
         </div>
       </div>
-    </>
+      <div style={{ marginBottom: "10px" }}></div>
+      <div className="container-xl d-flex justify-content-center align-items-center">
+        <button type="button" className="btn btn-primary" onClick={exportCSV}>
+          Download Expenses
+        </button>
+      </div>
+    </div>
   );
 };
 
