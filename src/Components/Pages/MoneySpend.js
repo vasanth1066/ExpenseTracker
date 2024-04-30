@@ -3,7 +3,6 @@ import { useDispatch } from "react-redux";
 import { ExpenseAction } from "../../Store/ExpenseStore";
 
 const MoneySpend = ({ isDarkMode }) => {
-  // Receive isDarkMode prop
   const dispatch = useDispatch();
   const [data, setData] = useState([]);
 
